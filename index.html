@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Media to URL Converter | Developer Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* Reset and base styles */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    body {
+      position: relative;
+      min-height: 100vh;
+    }
+    main {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      z-index: 2;
+    }
+    h1 {
+      margin: 0 0 0.3em 0;
+      font-size: 2.5em;
+      letter-spacing: 2px;
+    }
+    p {
+      margin: 0 0 1.5em 0;
+      color: #e0e0e0;
+      font-size: 1.1em;
+    }
+    .converter {
+      background: rgba(25, 25, 40, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.3);
+      padding: 2.5rem 2rem 2rem 2rem;
+      max-width: 400px;
+      width: 100%;
+      margin: 0 auto;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .file-input-label {
+      display: inline-block;
+      padding: 0.7em 2em;
+      background: #4f8cff;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 999px;
+      cursor: pointer;
+      margin-bottom: 1.4em;
+      transition: background 0.2s;
+      text-align: center;
+    }
+    .file-input-label:hover {
+      background: #3777ff;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .status, .result {
+      margin: 1.2em 0 0 0;
+      word-break: break-all;
+      text-align: center;
+    }
+    .result-link {
+      display: inline-block;
+      margin-top: 0.5em;
+      background: #232347;
+      padding: 0.5em 1em;
+      border-radius: 10px;
+      color: #4f8cff;
+      font-weight: bold;
+      text-decoration: underline;
+      word-break: break-all;
+    }
+    .preview-image, .preview-video, .preview-audio {
+      margin: 1em auto 0.5em auto;
+      display: block;
+      max-width: 96%;
+      max-height: 220px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+      background: #191928;
+    }
+    .copy-btn {
+      margin-top: 0.6em;
+      padding: 0.4em 1.2em;
+      border: none;
+      border-radius: 8px;
+      background: #4f8cff;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    .copy-btn:hover { background: #3777ff; }
+    .subtext {
+      font-size: 0.96em;
+      color: #b9b9e0;
+      margin-top: 0.2em;
+      opacity: 0.92;
+    }
+    /* Live background using animated SVG blobs and gradients */
+    #bg-animation {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      overflow: hidden;
+      background: radial-gradient(circle at 60% 15%, #4f8cff 0%, #232347 100%);
+    }
+    @media (max-width: 600px) {
+      .converter { max-width: 99vw; padding: 1.2rem 0.3rem; }
+      h1 { font-size: 1.5em; }
+    }
+    footer {
+      position: absolute;
+      bottom: 16px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.99em;
+      color: #c0c3ffb3;
+      z-index: 2;
+      letter-spacing: 1px;
+    }
+    a {
+      color: #a5bcff;
+    }
+  </style>
+</head>
+<body>
+  <div id="bg-animation">
+    <svg width="100%" height="100%" viewBox="0 0 1920 1080" preserveAspectRatio="none" style="position:absolute;top:0;left:0;">
+      <defs>
+        <radialGradient id="g1" cx="0.58" cy="0.15" r="1.2">
+          <stop offset="0%" stop-color="#4f8cff" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#232347" stop-opacity="0.85"/>
+        </radialGradient>
+        <radialGradient id="g2" cx="0.28" cy="0.89" r="1.3">
+          <stop offset="0%" stop-color="#e66465" stop-opacity="0.18"/>
+          <stop offset="100%" stop-color="#232347" stop-opacity="0.6"/>
+        </radialGradient>
+      </defs>
+      <ellipse id="blob1" cx="700" cy="350" rx="350" ry="310" fill="url(#g1)"/>
+      <ellipse id="blob2" cx="1400" cy="850" rx="280" ry="180" fill="url(#g2)"/>
+    </svg>
+  </div>
+  <main>
+    <header>
+      <h1>Pk Media to URL Converter</h1>
+      <p>Instantly upload &amp; convert your media to a shareable URL.<br>
+        <span class="subtext">Powered by <a href="https://imgbb.com/" target="_blank" rel="noopener">Pkdriller</a></span>
+      </p>
+    </header>
+    <section class="converter">
+      <form id="uploadForm" autocomplete="off">
+        <label class="file-input-label" for="fileInput">Choose Image/Video/Audio</label>
+        <input type="file" id="fileInput" name="media" accept="image/*,video/*,audio/*" required>
+        <div class="status" id="status"></div>
+        <div class="preview" id="preview"></div>
+        <div class="result" id="result"></div>
+      </form>
+    </section>
+  </main>
+  <footer>
+    &copy; 2025 <a href="https://github.com/Pkdriller" target="_blank" rel="noopener">Pkdriller</a> &mdash; Professional Developer
+  </footer>
+  <script>
+    // Animate SVG blobs for live background
+    const blob1 = document.getElementById('blob1');
+    const blob2 = document.getElementById('blob2');
+    let t = 0;
+    function animateBlobs() {
+      t += 0.017;
+      if (blob1) {
+        blob1.setAttribute('cx', 700 + Math.sin(t) * 42);
+        blob1.setAttribute('cy', 350 + Math.cos(t * 0.7) * 31);
+        blob1.setAttribute('rx', 350 + Math.cos(t * 0.5) * 25);
+        blob1.setAttribute('ry', 310 + Math.sin(t * 0.6) * 18);
+      }
+      if (blob2) {
+        blob2.setAttribute('cx', 1400 + Math.cos(t * 0.5) * 55);
+        blob2.setAttribute('cy', 850 + Math.sin(t * 1.2) * 34);
+        blob2.setAttribute('rx', 280 + Math.sin(t * 0.7) * 23);
+        blob2.setAttribute('ry', 180 + Math.cos(t * 0.8) * 17);
+      }
+      requestAnimationFrame(animateBlobs);
+    }
+    animateBlobs();
+
+    // UI logic
+    const fileInput = document.getElementById('fileInput');
+    const statusDiv = document.getElementById('status');
+    const resultDiv = document.getElementById('result');
+    const previewDiv = document.getElementById('preview');
+    const uploadForm = document.getElementById('uploadForm');
+
+    function showStatus(msg, isError = false) {
+      statusDiv.innerHTML = msg ? `<span style="color:${isError ? '#ff627b' : '#6cf1a5'}">${msg}</span>` : '';
+    }
+    function showPreview(file) {
+      previewDiv.innerHTML = '';
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      let el;
+      if (file.type.startsWith("image/")) {
+        el = document.createElement('img');
+        el.src = url;
+        el.className = 'preview-image';
+      } else if (file.type.startsWith("video/")) {
+        el = document.createElement('video');
+        el.src = url;
+        el.className = 'preview-video';
+        el.controls = true;
+      } else if (file.type.startsWith("audio/")) {
+        el = document.createElement('audio');
+        el.src = url;
+        el.className = 'preview-audio';
+        el.controls = true;
+      } else {
+        el = document.createElement('div');
+        el.textContent = 'Preview not available';
+      }
+      previewDiv.appendChild(el);
+    }
+    fileInput.addEventListener('change', (e) => {
+      const file = fileInput.files[0];
+      resultDiv.innerHTML = '';
+      if (!file) return showStatus('');
+      if (!/^image\/|^video\/|^audio\//.test(file.type)) {
+        showStatus('Unsupported file type. Please select image, video, or audio.', true);
+        fileInput.value = '';
+        return;
+      }
+      showStatus('');
+      showPreview(file);
+    });
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultDiv.innerHTML = '';
+      const file = fileInput.files[0];
+      if (!file) {
+        showStatus('Please choose a file to upload.', true);
+        return;
+      }
+      // Only images are supported by imgbb API
+      if (!/^image\//.test(file.type)) {
+        showStatus('Currently, only image uploads are supported by the API.', true);
+        return;
+      }
+      showStatus('Uploading...');
+      try {
+        // Convert image to base64
+        const base64 = await fileToBase64(file);
+        // Upload to imgbb
+        const formData = new FormData();
+        formData.append('image', base64.replace(/^data:image\/[a-z]+;base64,/, ''));
+        const res = await fetch('https://api.imgbb.com/1/upload?key=f07b8d2d9f0593bc853369f251a839de', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          showStatus('Upload successful!');
+          showResult(data.data.url, file);
+        } else {
+          throw new Error(data.error?.message || 'Upload failed.');
+        }
+      } catch (err) {
+        showStatus(err.message || 'Upload failed.', true);
+      }
+    });
+
+    function showResult(url, file) {
+      let html = `<div>Here's your media URL:</div>
+      <a class="result-link" href="${url}" target="_blank" rel="noopener">${url}</a>
+      <button class="copy-btn" onclick="navigator.clipboard.writeText('${url}')">Copy URL</button>`;
+      resultDiv.innerHTML = html;
+      // Replace preview with hosted image
+      if (file && /^image\//.test(file.type)) {
+        previewDiv.innerHTML = `<img src="${url}" class="preview-image" alt="Uploaded image">`;
+      }
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Failed to read file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Submit form on file selection (optional UX)
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        setTimeout(() => uploadForm.requestSubmit(), 400);
+      }
+    });
+  </script>
+</body>
+  </html>
